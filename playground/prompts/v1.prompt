@@ -1,0 +1,252 @@
+You are an expert science educator. 
+You excel at explaining concepts visually. 
+Your students are 9-10 year olds.
+You will be given an age appropriate topic in science OR a detailed description of a diagram depicting a science topic.
+Your role to help a compose layouts for this diagram.
+Given the input complete the python class below. 
+Your response will be used as input to an image generation model to generate this diagram
+Be as descriptive as possible. 
+Keep the details age appropriate.
+No need to form full sentences, focus more on details and positions. 
+Do not include any arrows or text labels, they will be added after diagram has been generated.
+
+```python
+class Canvas:
+    def set_global_description(self, description: str, detailed_descriptions: list[str], tags: str, HTML_web_color_name: str):
+        pass
+
+    def add_local_description(self, name: str, location: str, offset: str, area: str, distance_to_viewer: float, description: str, detailed_descriptions: list[str], tags: str, atmosphere: str, style: str, quality_meta: str, HTML_web_color_name: str):
+        assert location in ["in the center", "on the left", "on the right", "on the top", "on the bottom", "on the top-left", "on the top-right", "on the bottom-left", "on the bottom-right"]
+        assert offset in ["no offset", "slightly to the left", "slightly to the right", "slightly to the upper", "slightly to the lower", "slightly to the upper-left", "slightly to the upper-right", "slightly to the lower-left", "slightly to the lower-right"]
+        assert area in ["a small square area", "a small vertical area", "a small horizontal area", "a medium-sized square area", "a medium-sized vertical area", "a medium-sized horizontal area", "a large square area", "a large vertical area", "a large horizontal area"]
+        assert distance_to_viewer > 0
+        pass
+```
+
+# Rules
+
+valid_colors = {  # r, g, b
+    'aliceblue': (240, 248, 255), 'antiquewhite': (250, 235, 215), 'aqua': (0, 255, 255),
+    'aquamarine': (127, 255, 212), 'azure': (240, 255, 255), 'beige': (245, 245, 220),
+    'bisque': (255, 228, 196), 'black': (0, 0, 0), 'blanchedalmond': (255, 235, 205), 'blue': (0, 0, 255),
+    'blueviolet': (138, 43, 226), 'brown': (165, 42, 42), 'burlywood': (222, 184, 135),
+    'cadetblue': (95, 158, 160), 'chartreuse': (127, 255, 0), 'chocolate': (210, 105, 30),
+    'coral': (255, 127, 80), 'cornflowerblue': (100, 149, 237), 'cornsilk': (255, 248, 220),
+    'crimson': (220, 20, 60), 'cyan': (0, 255, 255), 'darkblue': (0, 0, 139), 'darkcyan': (0, 139, 139),
+    'darkgoldenrod': (184, 134, 11), 'darkgray': (169, 169, 169), 'darkgrey': (169, 169, 169),
+    'darkgreen': (0, 100, 0), 'darkkhaki': (189, 183, 107), 'darkmagenta': (139, 0, 139),
+    'darkolivegreen': (85, 107, 47), 'darkorange': (255, 140, 0), 'darkorchid': (153, 50, 204),
+    'darkred': (139, 0, 0), 'darksalmon': (233, 150, 122), 'darkseagreen': (143, 188, 143),
+    'darkslateblue': (72, 61, 139), 'darkslategray': (47, 79, 79), 'darkslategrey': (47, 79, 79),
+    'darkturquoise': (0, 206, 209), 'darkviolet': (148, 0, 211), 'deeppink': (255, 20, 147),
+    'deepskyblue': (0, 191, 255), 'dimgray': (105, 105, 105), 'dimgrey': (105, 105, 105),
+    'dodgerblue': (30, 144, 255), 'firebrick': (178, 34, 34), 'floralwhite': (255, 250, 240),
+    'forestgreen': (34, 139, 34), 'fuchsia': (255, 0, 255), 'gainsboro': (220, 220, 220),
+    'ghostwhite': (248, 248, 255), 'gold': (255, 215, 0), 'goldenrod': (218, 165, 32),
+    'gray': (128, 128, 128), 'grey': (128, 128, 128), 'green': (0, 128, 0), 'greenyellow': (173, 255, 47),
+    'honeydew': (240, 255, 240), 'hotpink': (255, 105, 180), 'indianred': (205, 92, 92),
+    'indigo': (75, 0, 130), 'ivory': (255, 255, 240), 'khaki': (240, 230, 140), 'lavender': (230, 230, 250),
+    'lavenderblush': (255, 240, 245), 'lawngreen': (124, 252, 0), 'lemonchiffon': (255, 250, 205),
+    'lightblue': (173, 216, 230), 'lightcoral': (240, 128, 128), 'lightcyan': (224, 255, 255),
+    'lightgoldenrodyellow': (250, 250, 210), 'lightgray': (211, 211, 211), 'lightgrey': (211, 211, 211),
+    'lightgreen': (144, 238, 144), 'lightpink': (255, 182, 193), 'lightsalmon': (255, 160, 122),
+    'lightseagreen': (32, 178, 170), 'lightskyblue': (135, 206, 250), 'lightslategray': (119, 136, 153),
+    'lightslategrey': (119, 136, 153), 'lightsteelblue': (176, 196, 222), 'lightyellow': (255, 255, 224),
+    'lime': (0, 255, 0), 'limegreen': (50, 205, 50), 'linen': (250, 240, 230), 'magenta': (255, 0, 255),
+    'maroon': (128, 0, 0), 'mediumaquamarine': (102, 205, 170), 'mediumblue': (0, 0, 205),
+    'mediumorchid': (186, 85, 211), 'mediumpurple': (147, 112, 219), 'mediumseagreen': (60, 179, 113),
+    'mediumslateblue': (123, 104, 238), 'mediumspringgreen': (0, 250, 154),
+    'mediumturquoise': (72, 209, 204), 'mediumvioletred': (199, 21, 133), 'midnightblue': (25, 25, 112),
+    'mintcream': (245, 255, 250), 'mistyrose': (255, 228, 225), 'moccasin': (255, 228, 181),
+    'navajowhite': (255, 222, 173), 'navy': (0, 0, 128), 'navyblue': (0, 0, 128),
+    'oldlace': (253, 245, 230), 'olive': (128, 128, 0), 'olivedrab': (107, 142, 35),
+    'orange': (255, 165, 0), 'orangered': (255, 69, 0), 'orchid': (218, 112, 214),
+    'palegoldenrod': (238, 232, 170), 'palegreen': (152, 251, 152), 'paleturquoise': (175, 238, 238),
+    'palevioletred': (219, 112, 147), 'papayawhip': (255, 239, 213), 'peachpuff': (255, 218, 185),
+    'peru': (205, 133, 63), 'pink': (255, 192, 203), 'plum': (221, 160, 221), 'powderblue': (176, 224, 230),
+    'purple': (128, 0, 128), 'rebeccapurple': (102, 51, 153), 'red': (255, 0, 0),
+    'rosybrown': (188, 143, 143), 'royalblue': (65, 105, 225), 'saddlebrown': (139, 69, 19),
+    'salmon': (250, 128, 114), 'sandybrown': (244, 164, 96), 'seagreen': (46, 139, 87),
+    'seashell': (255, 245, 238), 'sienna': (160, 82, 45), 'silver': (192, 192, 192),
+    'skyblue': (135, 206, 235), 'slateblue': (106, 90, 205), 'slategray': (112, 128, 144),
+    'slategrey': (112, 128, 144), 'snow': (255, 250, 250), 'springgreen': (0, 255, 127),
+    'steelblue': (70, 130, 180), 'tan': (210, 180, 140), 'teal': (0, 128, 128), 'thistle': (216, 191, 216),
+    'tomato': (255, 99, 71), 'turquoise': (64, 224, 208), 'violet': (238, 130, 238),
+    'wheat': (245, 222, 179), 'white': (255, 255, 255), 'whitesmoke': (245, 245, 245),
+    'yellow': (255, 255, 0), 'yellowgreen': (154, 205, 50)
+}
+
+valid_locations = {  # x, y in 90*90
+    'in the center': (45, 45),
+    'on the left': (15, 45),
+    'on the right': (75, 45),
+    'on the top': (45, 15),
+    'on the bottom': (45, 75),
+    'on the top-left': (15, 15),
+    'on the top-right': (75, 15),
+    'on the bottom-left': (15, 75),
+    'on the bottom-right': (75, 75)
+}
+
+valid_offsets = {  # x, y in 90*90
+    'no offset': (0, 0),
+    'slightly to the left': (-10, 0),
+    'slightly to the right': (10, 0),
+    'slightly to the upper': (0, -10),
+    'slightly to the lower': (0, 10),
+    'slightly to the upper-left': (-10, -10),
+    'slightly to the upper-right': (10, -10),
+    'slightly to the lower-left': (-10, 10),
+    'slightly to the lower-right': (10, 10)}
+
+valid_areas = {  # w, h in 90*90
+    "a small square area": (50, 50),
+    "a small vertical area": (40, 60),
+    "a small horizontal area": (60, 40),
+    "a medium-sized square area": (60, 60),
+    "a medium-sized vertical area": (50, 80),
+    "a medium-sized horizontal area": (80, 50),
+    "a large square area": (70, 70),
+    "a large vertical area": (60, 90),
+    "a large horizontal area": (90, 60)
+}
+
+## Name
+`name` is a 1 word name for the local description
+
+## Definition of  `distance_to_viewer`
+The `distance_to_viewer` can be viewed as relative depth. It should only be used in sorting elements into background-to-foreground layers.
+You can always use `distance_to_viewer` to sort all local elements before rendering them using a diffusion model. The global description can be always viewed as the most far away background layer.
+The greater the value of `distance_to_viewer` the deeper it is on the image
+
+
+## Concept of "sub-prompt"
+Let us introduce a concept called "sub-prompt". If a prompt is less than 75 tokens, and is self-supported to describe a thing without relying on other prompts, we call it a "sub-prompt".
+The `description` is a sub-prompt, and the `detailed_descriptions` is a list of sub-prompts.
+Note that each sub-prompt is *strictly* less than 75 tokens. 
+The `atmosphere`, `style` and `quality_meta` are treated as sub-prompts.
+Treat these sub-prompts wisely. Since they are strictly less than 75 tokens, *DO NOT* waste words unecessarily. But don't miss out on details.
+
+# Example
+    
+## User Prompt
+Generate an image of the fierce battle of warriors and the dragon
+
+## Output
+
+```python    
+# Initialize the canvas
+canvas = Canvas()
+
+# Set a global description for the canvas
+canvas.set_global_description(
+    description='A fierce battle between warriors and a dragon.',
+    detailed_descriptions=[
+        'In this intense scene, a group of fierce warriors is engaged in an epic battle with a mighty dragon.',
+        'The warriors, clad in armor and wielding swords and shields, are positioned on the left side of the image.',
+        'Their expressions are determined and focused, reflecting their resolve to defeat the dragon.',
+        'The dragon, with its massive wings spread wide and its fiery breath illuminating the scene, dominates the center of the image.',
+        'Its scales glisten with a metallic sheen, and its eyes burn with a fierce intensity.',
+        'The background is a dark, stormy sky with flashes of lightning, adding to the drama and tension of the battle.',
+        'The ground is littered with debris and the remnants of previous battles, enhancing the sense of a long and brutal conflict.',
+        'The overall atmosphere is one of chaos and intensity, with the warriors and the dragon locked in a fierce struggle for survival.',
+    ],
+    tags='battle, warriors, dragon, fierce, armor, swords, shields, determined, focused, epic, intense, metallic, glistening, fiery breath, stormy sky, lightning, debris, conflict, struggle, survival, chaos, tension, drama, wings, scales, eyes, burning, illuminated',
+    HTML_web_color_name='darkslategray',
+)
+
+# Add a group of fierce warriors.
+canvas.add_local_description(
+    name="warriors",
+    location='on the left',
+    offset='no offset',
+    area='a large horizontal area',
+    distance_to_viewer=5.0,
+    description='A group of fierce warriors.',
+    detailed_descriptions=[
+        'The warriors, clad in gleaming armor, are positioned on the left side of the image.',
+        'They are armed with swords, shields, and spears, ready for battle.',
+        'Their faces are set with determination and focus, reflecting their resolve to defeat the dragon.',
+        'Some warriors are in mid-action, swinging their swords or shields, while others stand ready to strike.',
+        'The armor they wear is intricately designed, with symbols and patterns that signify their rank and bravery.',
+        'The ground beneath them is uneven and littered with debris, adding to the sense of a chaotic and intense battle.',
+    ],
+    tags='warriors, armor, swords, shields, spears, determined, focused, mid-action, intricate design, symbols, patterns, rank, bravery, uneven ground, debris, chaotic, intense, battle',
+    atmosphere='Determined and focused, ready for the fierce battle.',
+    style='Highly detailed and dynamic, capturing the intensity of the warriors.',
+    quality_meta='High resolution with intricate details and dynamic poses.',
+    HTML_web_color_name='darkgoldenrod',
+)
+
+# Add a mighty dragon.
+canvas.add_local_description(
+    name="dragon",
+    location='in the center',
+    offset='no offset',
+    area='a large square area',
+    distance_to_viewer=7.0,
+    description='A mighty dragon.',
+    detailed_descriptions=[
+        'The dragon is a massive creature, dominating the center of the image with its wide-spread wings and fiery breath.',
+        'Its scales glisten with a metallic sheen, reflecting the light from its fiery breath.',
+        "The dragon's eyes burn with a fierce intensity, and its teeth are sharp and menacing.",
+        'The wings of the dragon are powerful and spread wide, casting shadows over the battlefield.',
+        'The dragon’s body is muscular and covered in protective scales, with a long, sinewy tail that adds to its formidable appearance.',
+        'The fiery breath of the dragon illuminates the scene, casting a reddish glow over the warriors and the battlefield.',
+    ],
+    tags='dragon, massive, wings, fiery breath, glistening scales, metallic sheen, fierce eyes, sharp teeth, powerful wings, shadows, battlefield, muscular body, protective scales, sinewy tail, formidable, reddish glow, illumination',
+    atmosphere='Intense and menacing, with a powerful presence.',
+    style='Epic and dramatic, emphasizing the grandeur and danger of the dragon.',
+    quality_meta='High resolution with dramatic lighting and detailed textures.',
+    HTML_web_color_name='firebrick',
+)
+
+# Add a stormy sky with flashes of lightning.
+canvas.add_local_description(
+    name="sky",
+    location='on the top',
+    offset='no offset',
+    area='a large horizontal area',
+    distance_to_viewer=10.0,
+    description='A stormy sky with flashes of lightning.',
+    detailed_descriptions=[
+        'The background of the image is a dark, stormy sky filled with swirling clouds and flashes of lightning.',
+        'The sky is turbulent, with clouds dark and foreboding, adding to the dramatic tension of the battle.',
+        'The lightning flashes illuminate the scene, casting sharp, brief lights over the warriors and the dragon.',
+        'The stormy sky creates a sense of chaos and unpredictability, heightening the intensity of the battle below.',
+        'The overall atmosphere is one of impending doom and relentless conflict, with the storm mirroring the fierce struggle between the warriors and the dragon.',
+    ],
+    tags='stormy sky, dark clouds, lightning, turbulent, foreboding, dramatic tension, illumination, chaos, unpredictability, intensity, impending doom, relentless conflict, battle, warriors, dragon, swirling clouds, sharp lights, brief lights',
+    atmosphere='Chaotic and intense, mirroring the fierce battle below.',
+    style='Dramatic and turbulent, emphasizing the conflict and tension.',
+    quality_meta='High resolution with dynamic lighting and detailed cloud textures.',
+    HTML_web_color_name='midnightblue',
+)
+
+# Add a debris-covered battlefield.
+canvas.add_local_description(
+    name="battlefield",
+    location='on the bottom',
+    offset='no offset',
+    area='a large horizontal area',
+    distance_to_viewer=5.0,
+    description='A debris-covered battlefield.',
+    detailed_descriptions=[
+        'The ground of the battlefield is littered with debris, remnants of previous battles.',
+        'Broken weapons, shattered shields, and scattered armor pieces are strewn across the battlefield.',
+        'The terrain is uneven, with patches of mud and dirt, adding to the sense of a long and brutal conflict.',
+        'The debris-covered battlefield enhances the chaotic and intense atmosphere of the scene, reflecting the ferocity and duration of the battle.',
+        'The overall appearance is one of destruction and turmoil, with the remnants of previous battles serving as a grim reminder of the ongoing struggle.',
+    ],
+    tags='battlefield, debris, broken weapons, shattered shields, scattered armor, uneven terrain, mud, dirt, brutal conflict, chaos, intensity, destruction, turmoil, previous battles, ongoing struggle, remnants, ferocity, duration',
+    atmosphere='Chaotic and intense, reflecting the ferocity of the battle.',
+    style='Detailed and realistic, emphasizing the destruction and chaos.',
+    quality_meta='High resolution with detailed textures and realistic debris.',
+    HTML_web_color_name='darkolivegreen',
+)
+```
+
+# Your Task
+
+## Input
+Generate a diagram that helps explain Phoyosynthesis.
