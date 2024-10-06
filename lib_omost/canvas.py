@@ -2,6 +2,9 @@ import re
 import difflib
 import numpy as np
 
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 system_prompt = r'''You are a helpful AI assistant to compose images using the below python class `Canvas`:
 
 ```python
@@ -169,9 +172,10 @@ class Canvas:
 
         return
 
-    def add_local_description(self, location: str, offset: str, area: str, distance_to_viewer: float, description: str,
+    def add_local_description(self, distance_to_viewer: float, description: str,
                               detailed_descriptions: list[str], tags: str, atmosphere: str, style: str,
-                              quality_meta: str, HTML_web_color_name: str):
+                              quality_meta: str, HTML_web_color_name: str, 
+                              location: str = None, offset: str = None, area: str = None, bbox = None, name: str = None):
         assert isinstance(description, str), 'Local description is wrong!'
         assert isinstance(distance_to_viewer, (int, float)) and distance_to_viewer > 0, \
             f'The distance_to_viewer for [{description}] is not positive float number!'
@@ -182,16 +186,24 @@ class Canvas:
         assert isinstance(style, str), f'The style for [{description}] is not valid!'
         assert isinstance(quality_meta, str), f'The quality_meta for [{description}] is not valid!'
 
-        location = closest_name(location, valid_locations)
-        offset = closest_name(offset, valid_offsets)
-        area = closest_name(area, valid_areas)
         HTML_web_color_name = closest_name(HTML_web_color_name, valid_colors)
+        
+        if bbox is not None:
+            x, y, w, h = bbox
+            assert 0 <= x <= x + w <= 90
+            assert 0 <= y <= y + h <= 90
+            rect = (y, y + h, x, x + w)
+        else:
+            location = closest_name(location, valid_locations)
+            offset = closest_name(offset, valid_offsets)
+            area = closest_name(area, valid_areas)
+            
+            xb, yb = valid_locations[location]
+            xo, yo = valid_offsets[offset]
+            w, h = valid_areas[area]
+            rect = (yb + yo - h // 2, yb + yo + h // 2, xb + xo - w // 2, xb + xo + w // 2)
+            rect = [max(0, min(90, i)) for i in rect]
 
-        xb, yb = valid_locations[location]
-        xo, yo = valid_offsets[offset]
-        w, h = valid_areas[area]
-        rect = (yb + yo - h // 2, yb + yo + h // 2, xb + xo - w // 2, xb + xo + w // 2)
-        rect = [max(0, min(90, i)) for i in rect]
         color = np.array([[valid_colors[HTML_web_color_name]]], dtype=np.uint8)
 
         prefixes = self.prefixes + [description]
@@ -204,6 +216,7 @@ class Canvas:
         suffixes = [safe_str(x) for x in suffixes]
 
         self.components.append(dict(
+            name=name,
             rect=rect,
             distance_to_viewer=distance_to_viewer,
             color=color,
@@ -219,12 +232,26 @@ class Canvas:
 
         # compute initial latent
         initial_latent = np.zeros(shape=(90, 90, 3), dtype=np.float32) + self.color
+        
+        bboxed = initial_latent.copy()
+        fig, ax = plt.subplots(1)
+        ax.imshow(bboxed)
 
         for component in self.components:
             a, b, c, d = component['rect']
             initial_latent[a:b, c:d] = 0.7 * component['color'] + 0.3 * initial_latent[a:b, c:d]
+            
+            bboxed[a:b, c:d] = 0.7 * component['color'] + 0.3 * bboxed[a:b, c:d]
+            y_min, y_max, x_min, x_max = component['rect']
+            rect = patches.Rectangle((x_min, y_min), x_max - x_min, y_max - y_min, linewidth=1, edgecolor='r', facecolor='none')
+            ax.add_patch(rect)
+            plt.text(x_min, y_min+2, component['name'], color='red', fontsize=8, backgroundcolor='white')
+            
 
         initial_latent = initial_latent.clip(0, 255).astype(np.uint8)
+        
+        bboxed = bboxed.clip(0, 255).astype(np.uint8)
+        plt.show()
 
         # compute conditions
 
